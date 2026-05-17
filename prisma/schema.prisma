@@ -1,0 +1,136 @@
+// Prisma schema для Тичер AI
+// См. context.md для описания моделей и подписочной модели.
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String?
+  image        String?
+  passwordHash String?   // null если регистрация через OAuth
+  level        String    @default("B1")
+  interests    String[]  @default([])
+  onboardedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  subscription  Subscription?
+  essays        Essay[]
+  writtenEssays WrittenEssay[]
+  wordHistory   WordTranslation[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Subscription {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  status      SubStatus @default(INACTIVE)
+  startedAt   DateTime?
+  trialEndsAt DateTime?
+  expiresAt   DateTime?
+  tinkoffId   String?
+  rebillId    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum SubStatus {
+  TRIAL
+  ACTIVE
+  INACTIVE
+  CANCELLED
+  EXPIRED
+}
+
+model Essay {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  content   String   @db.Text
+  topic     String?
+  interest  String?
+  level     String?
+  createdAt DateTime @default(now())
+
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  writtenEssays  WrittenEssay[]
+
+  @@index([userId, createdAt])
+}
+
+model WrittenEssay {
+  id             String   @id @default(cuid())
+  userId         String
+  sourceEssayId  String?
+  topic          String
+  content        String   @db.Text
+  review         Json
+  score          Int
+  estimatedLevel String?
+  wordCount      Int
+  createdAt      DateTime @default(now())
+
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceEssay Essay? @relation(fields: [sourceEssayId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+}
+
+model WordTranslation {
+  id          String   @id @default(cuid())
+  userId      String
+  word        String
+  translation String
+  context     String?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, word])
+}
