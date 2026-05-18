@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma"
 import { getAccessState } from "@/lib/subscription"
 import { LinkButton } from "@/components/ui/Button"
 import { WriteEssayForm } from "@/components/essay/WriteEssayForm"
+import { getLanguageOrDefault } from "@/lib/languages"
 
 export default async function WriteEssayPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -14,10 +15,11 @@ export default async function WriteEssayPage({ params }: { params: Promise<{ id:
 
   const essay = await prisma.essay.findUnique({
     where: { id },
-    select: { id: true, title: true, topic: true, userId: true },
+    select: { id: true, title: true, topic: true, userId: true, language: true },
   })
   if (!essay || essay.userId !== session.user.id) notFound()
 
+  const language = getLanguageOrDefault(essay.language)
   const access = await getAccessState(session.user.id)
 
   return (
@@ -31,7 +33,7 @@ export default async function WriteEssayPage({ params }: { params: Promise<{ id:
 
       <h1 className="mt-6 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Напиши своё эссе</h1>
       <p className="mt-2 text-sm text-zinc-600 sm:text-base">
-        Напиши эссе на эту же тему на английском. ИИ проверит грамматику, лексику и стиль, выставит оценку 0–100 и подскажет, что улучшить.
+        Напиши эссе на эту же тему на языке: <span className="font-semibold text-zinc-900">{language.label}</span>. ИИ проверит грамматику, лексику и стиль, выставит оценку 0–100 и подскажет, что улучшить.
       </p>
 
       {!access.canGenerate ? (
@@ -46,7 +48,11 @@ export default async function WriteEssayPage({ params }: { params: Promise<{ id:
         </div>
       ) : (
         <div className="mt-10">
-          <WriteEssayForm sourceEssayId={essay.id} topic={essay.topic || essay.title} />
+          <WriteEssayForm
+            sourceEssayId={essay.id}
+            topic={essay.topic || essay.title}
+            languageLabel={language.label}
+          />
         </div>
       )}
     </div>

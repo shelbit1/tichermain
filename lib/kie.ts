@@ -6,6 +6,8 @@ const KIE_ENDPOINT = "https://api.kie.ai/claude/v1/messages"
 export type GenerateEssayParams = {
   topic: string
   level: string // A1..C2
+  // Полное имя языка эссе по-английски (например, "English", "Spanish", "Chinese (Simplified)").
+  languageName: string
 }
 
 export type GeneratedEssay = {
@@ -52,21 +54,27 @@ function fingerprintKey(key: string | undefined) {
   }
 }
 
-export async function generateEssay({ topic, level }: GenerateEssayParams): Promise<GeneratedEssay> {
+export async function generateEssay({
+  topic,
+  level,
+  languageName,
+}: GenerateEssayParams): Promise<GeneratedEssay> {
   const apiKey = process.env.KIE_AI_API_KEY
   const model = process.env.KIE_AI_MODEL || "claude-sonnet-4-6"
   if (!apiKey) throw new Error("KIE_AI_API_KEY is not configured")
 
   const systemPrompt =
-    "You are an English teacher creating reading material for language learners. " +
-    "Always answer strictly in valid JSON with keys `title` and `content`. " +
-    "No markdown, no commentary, no code fences."
+    `You are a language teacher creating reading material for ${languageName} learners. ` +
+    `Always answer strictly in valid JSON with keys \`title\` and \`content\`. ` +
+    `Both \`title\` and \`content\` MUST be written entirely in ${languageName}. ` +
+    `No markdown, no commentary, no code fences.`
 
   const userPrompt =
-    `Write a ${level}-level English essay on: "${topic}".\n` +
-    `Length: 200-300 words. Use vocabulary appropriate for ${level} learners.\n` +
+    `Write a ${level}-level essay in ${languageName} on the topic: "${topic}".\n` +
+    `Length: 200-300 words (for ${languageName} use a comparable length: ~200-300 words or ~300-500 characters for Chinese).\n` +
+    `Use vocabulary appropriate for ${level} learners of ${languageName}.\n` +
     `Split the essay into 3-5 short paragraphs separated by blank lines.\n` +
-    `Return JSON: {"title": "...", "content": "..."} (content is the essay text).`
+    `Return JSON: {"title": "...", "content": "..."} where both fields are in ${languageName}.`
 
   const res = await fetch(KIE_ENDPOINT, {
     method: "POST",
@@ -172,19 +180,22 @@ export type ReviewEssayParams = {
   topic: string
   userLevel: string
   essay: string
+  // Полное имя языка эссе по-английски ("English", "Spanish", ...).
+  languageName: string
 }
 
-const REVIEW_SYSTEM_PROMPT = `You are an expert English teacher and CEFR-certified examiner.
-You will receive a short essay written by a learner. Your job is to assess it and produce a strict JSON report.
+function buildReviewSystemPrompt(languageName: string) {
+  return `You are an expert ${languageName} teacher and CEFR-certified examiner.
+You will receive a short essay written by a learner of ${languageName}. Your job is to assess it and produce a strict JSON report.
 
 Rules:
 - Reply with VALID JSON only. No markdown, no code fences, no commentary.
-- All explanations MUST be written in RUSSIAN.
-- All "original", "corrected", and "better" fields stay in English.
+- All explanations (summary, strengths, weaknesses, advice, explanation, reason) MUST be written in RUSSIAN.
+- All "original", "corrected", and "better" fields MUST stay in ${languageName} (do not translate them).
 - score is an integer 0..100 (0=incoherent, 100=native fluent).
-- estimatedLevel is one of A1, A2, B1, B2, C1, C2.
-- corrections: list each meaningful error you find. Quote the exact original phrase from the user's essay. Provide the corrected version and a short Russian explanation. Limit to the 10 most important issues. type ∈ {grammar, vocabulary, spelling, style, punctuation}.
-- vocabularySuggestions: 3–6 ways to upgrade vocabulary or phrasing (each with original word/phrase from the essay and a stronger alternative + short Russian "reason").
+- estimatedLevel is one of A1, A2, B1, B2, C1, C2 (CEFR applied to ${languageName}).
+- corrections: list each meaningful error you find. Quote the exact original phrase from the user's essay. Provide the corrected version in ${languageName} and a short Russian explanation. Limit to the 10 most important issues. type ∈ {grammar, vocabulary, spelling, style, punctuation}.
+- vocabularySuggestions: 3–6 ways to upgrade vocabulary or phrasing (each with original word/phrase from the essay in ${languageName} and a stronger alternative in ${languageName} + short Russian "reason").
 - strengths and weaknesses: 2–4 bullet points each, in Russian.
 - advice: 2–3 actionable sentences in Russian.
 
@@ -199,15 +210,22 @@ Response shape:
   "vocabularySuggestions": [{ "original": "...", "better": "...", "reason": "..." }],
   "advice": "..."
 }`
+}
 
-export async function reviewEssay({ topic, userLevel, essay }: ReviewEssayParams): Promise<EssayReview> {
+export async function reviewEssay({
+  topic,
+  userLevel,
+  essay,
+  languageName,
+}: ReviewEssayParams): Promise<EssayReview> {
   const apiKey = process.env.KIE_AI_API_KEY
   const model = process.env.KIE_AI_MODEL || "claude-sonnet-4-6"
   if (!apiKey) throw new Error("KIE_AI_API_KEY is not configured")
 
   const userPrompt =
     `Topic the essay was supposed to be about: "${topic}".\n` +
-    `Self-declared CEFR level of the author: ${userLevel}.\n\n` +
+    `Self-declared CEFR level of the author for ${languageName}: ${userLevel}.\n` +
+    `Language of the essay: ${languageName}.\n\n` +
     `=== ESSAY ===\n${essay.trim()}\n=== END ===\n\n` +
     `Produce the JSON report now.`
 
@@ -221,7 +239,7 @@ export async function reviewEssay({ topic, userLevel, essay }: ReviewEssayParams
       model,
       stream: false,
       max_tokens: 2048,
-      system: REVIEW_SYSTEM_PROMPT,
+      system: buildReviewSystemPrompt(languageName),
       messages: [{ role: "user", content: userPrompt }],
     }),
   })

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { translateWord } from "@/lib/deepl"
+import { getLanguageOrDefault, isValidLanguageSlug } from "@/lib/languages"
 
 export async function POST(req: Request) {
   const session = await auth()
@@ -10,7 +11,7 @@ export async function POST(req: Request) {
   }
 
   const body = (await req.json().catch(() => null)) as
-    | { word?: unknown; context?: unknown }
+    | { word?: unknown; context?: unknown; language?: unknown }
     | null
   const word = typeof body?.word === "string" ? body.word.trim() : ""
   if (!word || word.length > 60) {
@@ -18,9 +19,15 @@ export async function POST(req: Request) {
   }
   const context = typeof body?.context === "string" ? body.context.slice(0, 500) : null
 
-  // Кэш: если такое слово уже переводили этим юзером — возвращаем сразу.
+  const language = getLanguageOrDefault(
+    typeof body?.language === "string" && isValidLanguageSlug(body.language) ? body.language : null
+  )
+
+  // Кэш-ключ зависит и от языка-источника — одно и то же слово в разных языках
+  // может переводиться по-разному (например, «no» в EN/ES).
+  const cacheKey = `${language.slug}:${word.toLowerCase()}`
   const cached = await prisma.wordTranslation.findFirst({
-    where: { userId: session.user.id, word: word.toLowerCase() },
+    where: { userId: session.user.id, word: cacheKey },
     orderBy: { createdAt: "desc" },
   })
   if (cached) {
@@ -28,11 +35,11 @@ export async function POST(req: Request) {
   }
 
   try {
-    const translation = await translateWord(word)
+    const translation = await translateWord(word, { sourceLang: language.deeplSource })
     await prisma.wordTranslation.create({
       data: {
         userId: session.user.id,
-        word: word.toLowerCase(),
+        word: cacheKey,
         translation,
         context,
       },

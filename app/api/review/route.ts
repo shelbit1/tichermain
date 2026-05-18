@@ -5,12 +5,21 @@ import { prisma } from "@/lib/prisma"
 import { reviewEssay } from "@/lib/kie"
 import { getAccessState } from "@/lib/subscription"
 import { isValidLevel } from "@/lib/interests"
+import { DEFAULT_LANGUAGE, getLanguageOrDefault, isValidLanguageSlug } from "@/lib/languages"
+
+export const maxDuration = 60
 
 const MIN_WORDS = 30
 const MAX_WORDS = 600
 
-function countWords(text: string) {
-  return text.trim().split(/\s+/).filter(Boolean).length
+// Для языков без пробелов между словами (китайский) считаем «слова» по символам CJK.
+function countWords(text: string, languageSlug: string) {
+  const trimmed = text.trim()
+  if (!trimmed) return 0
+  if (languageSlug === "chinese") {
+    return Array.from(trimmed).filter((ch) => /[\u3400-\u9fff]/.test(ch)).length
+  }
+  return trimmed.split(/\s+/).filter(Boolean).length
 }
 
 export async function POST(req: Request) {
@@ -28,12 +37,33 @@ export async function POST(req: Request) {
   }
 
   const body = (await req.json().catch(() => null)) as
-    | { sourceEssayId?: unknown; topic?: unknown; content?: unknown }
+    | { sourceEssayId?: unknown; topic?: unknown; content?: unknown; language?: unknown }
     | null
   if (!body) return NextResponse.json({ error: "Invalid body" }, { status: 400 })
 
   const content = typeof body.content === "string" ? body.content.trim() : ""
-  const wordCount = countWords(content)
+
+  const sourceEssayId = typeof body.sourceEssayId === "string" ? body.sourceEssayId : null
+  let topic = typeof body.topic === "string" ? body.topic.trim().slice(0, 200) : ""
+
+  // Язык: из исходного эссе, либо из body, либо дефолтный.
+  let languageSlug: string = DEFAULT_LANGUAGE
+  if (sourceEssayId) {
+    const source = await prisma.essay.findUnique({
+      where: { id: sourceEssayId },
+      select: { userId: true, topic: true, title: true, language: true },
+    })
+    if (!source || source.userId !== session.user.id) {
+      return NextResponse.json({ error: "Source essay not found" }, { status: 404 })
+    }
+    topic = source.topic || source.title
+    languageSlug = source.language
+  } else if (typeof body.language === "string" && isValidLanguageSlug(body.language)) {
+    languageSlug = body.language
+  }
+  const language = getLanguageOrDefault(languageSlug)
+
+  const wordCount = countWords(content, language.slug)
   if (wordCount < MIN_WORDS) {
     return NextResponse.json(
       { error: `Минимум ${MIN_WORDS} слов. У тебя сейчас ${wordCount}.` },
@@ -47,21 +77,6 @@ export async function POST(req: Request) {
     )
   }
 
-  const sourceEssayId = typeof body.sourceEssayId === "string" ? body.sourceEssayId : null
-  let topic = typeof body.topic === "string" ? body.topic.trim().slice(0, 200) : ""
-
-  // Если указан sourceEssayId — берём тему из него и проверяем доступ.
-  if (sourceEssayId) {
-    const source = await prisma.essay.findUnique({
-      where: { id: sourceEssayId },
-      select: { userId: true, topic: true, title: true },
-    })
-    if (!source || source.userId !== session.user.id) {
-      return NextResponse.json({ error: "Source essay not found" }, { status: 404 })
-    }
-    topic = source.topic || source.title
-  }
-
   if (!topic) {
     return NextResponse.json({ error: "Не указана тема эссе" }, { status: 400 })
   }
@@ -73,7 +88,12 @@ export async function POST(req: Request) {
   const userLevel = user && isValidLevel(user.level) ? user.level : "B1"
 
   try {
-    const review = await reviewEssay({ topic, userLevel, essay: content })
+    const review = await reviewEssay({
+      topic,
+      userLevel,
+      essay: content,
+      languageName: language.englishName,
+    })
 
     const written = await prisma.writtenEssay.create({
       data: {
@@ -84,6 +104,7 @@ export async function POST(req: Request) {
         review: review as unknown as Prisma.InputJsonValue,
         score: review.score,
         estimatedLevel: review.estimatedLevel,
+        language: language.slug,
         wordCount,
       },
       select: { id: true },

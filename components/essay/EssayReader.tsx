@@ -2,9 +2,12 @@
 
 import { useState, useRef, useEffect } from "react"
 import { Loader2 } from "lucide-react"
+import type { LanguageSlug } from "@/lib/languages"
 
 type Props = {
   content: string
+  // Язык исходного текста. От него зависит токенизация и source_lang для DeepL.
+  language: LanguageSlug
 }
 
 type ActiveWord = {
@@ -15,9 +18,13 @@ type ActiveWord = {
   rect: DOMRect
 }
 
-const cleanForApi = (raw: string) => raw.replace(/[^A-Za-z'\-]+/g, "")
+// Оставляем буквы любых алфавитов, диакритику, апостроф и дефис. Знаки препинания режем.
+const cleanForApi = (raw: string) => raw.replace(/[^\p{L}\p{M}'\-]+/gu, "")
 
-export function EssayReader({ content }: Props) {
+// Является ли символ китайским иероглифом (CJK Unified Ideographs + Extension A).
+const isCjk = (ch: string) => /[\u3400-\u9fff]/.test(ch)
+
+export function EssayReader({ content, language }: Props) {
   const [active, setActive] = useState<ActiveWord | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -49,7 +56,7 @@ export function EssayReader({ content }: Props) {
       const res = await fetch("/api/translate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ word }),
+        body: JSON.stringify({ word, language }),
       })
       const data = await res.json()
       setActive((prev) =>
@@ -67,17 +74,22 @@ export function EssayReader({ content }: Props) {
   }
 
   const paragraphs = content.split(/\n{2,}|\r\n{2,}/).filter((p) => p.trim().length > 0)
+  // В китайском нет пробелов между словами — делаем кликабельной каждую CJK-букву.
+  const tokenize = (para: string): string[] =>
+    language === "chinese" ? Array.from(para) : para.split(/(\s+)/)
 
   return (
     <div ref={containerRef} className="relative">
       <div className="space-y-5 text-[16px] leading-7 text-zinc-800 sm:text-[17px] sm:leading-8">
         {paragraphs.map((para, pi) => {
-          const tokens = para.split(/(\s+)/)
+          const tokens = tokenize(para)
           return (
             <p key={pi}>
               {tokens.map((tok, ti) => {
                 if (/^\s+$/.test(tok)) return <span key={ti}>{tok}</span>
-                if (!cleanForApi(tok)) return <span key={ti}>{tok}</span>
+                const clickable =
+                  language === "chinese" ? isCjk(tok) : Boolean(cleanForApi(tok))
+                if (!clickable) return <span key={ti}>{tok}</span>
                 const key = `${pi}-${ti}`
                 const isActive = active?.key === key
                 return (

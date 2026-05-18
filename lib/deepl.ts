@@ -1,4 +1,4 @@
-// DeepL Free API: перевод одного слова или фразы EN → RU.
+// DeepL Free API: пословный/фразовый перевод исходного языка → RU.
 // Ключи free-аккаунта имеют суффикс `:fx`.
 
 const DEEPL_FREE_URL = "https://api-free.deepl.com/v2/translate"
@@ -9,9 +9,27 @@ function deeplEndpoint() {
   return key.endsWith(":fx") ? DEEPL_FREE_URL : DEEPL_PRO_URL
 }
 
-export async function translateWord(word: string, targetLang: string = "RU"): Promise<string> {
+export type TranslateWordOptions = {
+  // Код DeepL: EN, ES, TR, ZH и т.д. Если null/undefined — DeepL автоопределит
+  // (используется для языков без поддержки, например азербайджанский).
+  sourceLang?: string | null
+  targetLang?: string
+}
+
+export async function translateWord(
+  word: string,
+  options: TranslateWordOptions = {}
+): Promise<string> {
   const apiKey = process.env.DEEPL_API_KEY
   if (!apiKey) throw new Error("DEEPL_API_KEY is not configured")
+
+  const targetLang = options.targetLang || "RU"
+
+  const body: Record<string, unknown> = {
+    text: [word],
+    target_lang: targetLang,
+  }
+  if (options.sourceLang) body.source_lang = options.sourceLang
 
   const res = await fetch(deeplEndpoint(), {
     method: "POST",
@@ -19,11 +37,7 @@ export async function translateWord(word: string, targetLang: string = "RU"): Pr
       Authorization: `DeepL-Auth-Key ${apiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      text: [word],
-      source_lang: "EN",
-      target_lang: targetLang,
-    }),
+    body: JSON.stringify(body),
   })
 
   if (!res.ok) {

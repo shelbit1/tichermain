@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { INTERESTS, ENGLISH_LEVELS, type EnglishLevel, type InterestSlug } from "@/lib/interests"
+import { LANGUAGES, DEFAULT_LANGUAGE, type LanguageSlug } from "@/lib/languages"
 import { Button } from "@/components/ui/Button"
 import { cn } from "@/lib/utils"
 
@@ -26,6 +27,7 @@ export function NewEssayForm({ defaultLevel, userInterests }: Props) {
 
   const [interest, setInterest] = useState<InterestSlug>(initialInterest)
   const [level, setLevel] = useState<EnglishLevel>(defaultLevel)
+  const [language, setLanguage] = useState<LanguageSlug>(DEFAULT_LANGUAGE)
   const [topic, setTopic] = useState("")
 
   const visibleInterests = userInterests.length > 0
@@ -38,7 +40,7 @@ export function NewEssayForm({ defaultLevel, userInterests }: Props) {
       const res = await fetch("/api/essay", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ interest, level, topic: topic.trim() || undefined }),
+        body: JSON.stringify({ interest, level, language, topic: topic.trim() || undefined }),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
@@ -92,6 +94,30 @@ export function NewEssayForm({ defaultLevel, userInterests }: Props) {
               </button>
             )
           })}
+        </div>
+      </div>
+
+      <div>
+        <label className="text-sm font-semibold text-zinc-900">Язык эссе</label>
+        <p className="mt-1 text-sm text-zinc-500">
+          Текст эссе будет на выбранном языке. Перевод слов и разбор — на русском.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {LANGUAGES.map((lang) => (
+            <button
+              key={lang.slug}
+              type="button"
+              onClick={() => setLanguage(lang.slug)}
+              className={cn(
+                "h-10 cursor-pointer rounded-lg border px-4 text-sm font-medium transition-colors",
+                language === lang.slug
+                  ? "border-blue-600 bg-blue-600 text-white"
+                  : "border-zinc-300 bg-white text-zinc-700 hover:border-zinc-400"
+              )}
+            >
+              {lang.label}
+            </button>
+          ))}
         </div>
       </div>
 

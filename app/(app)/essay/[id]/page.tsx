@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma"
 import { EssayReader } from "@/components/essay/EssayReader"
 import { LinkButton } from "@/components/ui/Button"
 import { getInterest, type InterestSlug } from "@/lib/interests"
+import { getLanguageOrDefault, type LanguageSlug } from "@/lib/languages"
 
 export default async function EssayPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -20,6 +21,7 @@ export default async function EssayPage({ params }: { params: Promise<{ id: stri
       content: true,
       level: true,
       interest: true,
+      language: true,
       createdAt: true,
       userId: true,
     },
@@ -28,6 +30,7 @@ export default async function EssayPage({ params }: { params: Promise<{ id: stri
   if (!essay || essay.userId !== session.user.id) notFound()
 
   const interest = essay.interest ? getInterest(essay.interest as InterestSlug) : null
+  const language = getLanguageOrDefault(essay.language)
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
@@ -42,6 +45,9 @@ export default async function EssayPage({ params }: { params: Promise<{ id: stri
             {essay.level}
           </span>
         )}
+        <span className="rounded-md bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700">
+          {language.label}
+        </span>
         {interest && (
           <span className="text-xs text-zinc-500">{interest.label}</span>
         )}
@@ -59,7 +65,7 @@ export default async function EssayPage({ params }: { params: Promise<{ id: stri
       </p>
 
       <div className="mt-8 sm:mt-10">
-        <EssayReader content={essay.content} />
+        <EssayReader content={essay.content} language={essay.language as LanguageSlug} />
       </div>
 
       <div className="mt-12 rounded-2xl border border-zinc-200 bg-white p-5 sm:mt-14 sm:p-8">

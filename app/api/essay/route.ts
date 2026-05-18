@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { generateEssay } from "@/lib/kie"
 import { getAccessState } from "@/lib/subscription"
 import { INTERESTS, getInterest, isValidInterestSlug, isValidLevel } from "@/lib/interests"
+import { DEFAULT_LANGUAGE, getLanguageOrDefault, isValidLanguageSlug } from "@/lib/languages"
 
 // KIE-генерация бывает 15–25 с; защищаемся от дефолтного 10-секундного лимита Vercel.
 export const maxDuration = 60
@@ -27,9 +28,13 @@ export async function POST(req: Request) {
   }
 
   const body = (await req.json().catch(() => null)) as
-    | { interest?: unknown; topic?: unknown; level?: unknown }
+    | { interest?: unknown; topic?: unknown; level?: unknown; language?: unknown }
     | null
   if (!body) return NextResponse.json({ error: "Invalid body" }, { status: 400 })
+
+  const requestedLanguage = typeof body.language === "string" ? body.language : ""
+  const languageSlug = isValidLanguageSlug(requestedLanguage) ? requestedLanguage : DEFAULT_LANGUAGE
+  const language = getLanguageOrDefault(languageSlug)
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -63,7 +68,11 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { title, content } = await generateEssay({ topic, level })
+    const { title, content } = await generateEssay({
+      topic,
+      level,
+      languageName: language.englishName,
+    })
     const essay = await prisma.essay.create({
       data: {
         userId: session.user.id,
@@ -72,6 +81,7 @@ export async function POST(req: Request) {
         topic,
         interest: interestSlug,
         level,
+        language: language.slug,
       },
       select: { id: true },
     })

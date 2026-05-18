@@ -96,6 +96,7 @@ model Essay {
   topic     String?
   interest  String?
   level     String?
+  language  String   @default("english")
   createdAt DateTime @default(now())
 
   user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -113,6 +114,7 @@ model WrittenEssay {
   review         Json
   score          Int
   estimatedLevel String?
+  language       String   @default("english")
   wordCount      Int
   createdAt      DateTime @default(now())
 

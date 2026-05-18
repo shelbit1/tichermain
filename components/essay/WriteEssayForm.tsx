@@ -11,18 +11,25 @@ const MAX_WORDS = 600
 type Props = {
   sourceEssayId?: string
   topic: string
+  // Русское название языка исходного эссе — показываем в placeholder.
+  languageLabel: string
 }
 
-export function WriteEssayForm({ sourceEssayId, topic }: Props) {
+export function WriteEssayForm({ sourceEssayId, topic, languageLabel }: Props) {
   const router = useRouter()
   const [content, setContent] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
 
-  const wordCount = useMemo(
-    () => content.trim().split(/\s+/).filter(Boolean).length,
-    [content]
-  )
+  const wordCount = useMemo(() => {
+    const trimmed = content.trim()
+    if (!trimmed) return 0
+    // Для китайского считаем по CJK-иероглифам (нет пробелов между словами).
+    if (languageLabel === "Китайский") {
+      return Array.from(trimmed).filter((ch) => /[\u3400-\u9fff]/.test(ch)).length
+    }
+    return trimmed.split(/\s+/).filter(Boolean).length
+  }, [content, languageLabel])
   const tooShort = wordCount > 0 && wordCount < MIN_WORDS
   const tooLong = wordCount > MAX_WORDS
   const canSubmit = wordCount >= MIN_WORDS && wordCount <= MAX_WORDS && !pending
@@ -56,7 +63,7 @@ export function WriteEssayForm({ sourceEssayId, topic }: Props) {
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="Write your essay in English… Минимум 30 слов, максимум 600."
+          placeholder={`Напиши эссе на языке: ${languageLabel}. Минимум 30 слов, максимум 600.`}
           rows={14}
           className="w-full rounded-2xl border border-zinc-300 bg-white px-5 py-4 text-[15px] leading-7 text-zinc-900 placeholder:text-zinc-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
         />
@@ -70,7 +77,7 @@ export function WriteEssayForm({ sourceEssayId, topic }: Props) {
                   : "text-zinc-500"
             }
           >
-            {wordCount} слов
+            {wordCount} {languageLabel === "Китайский" ? "иероглифов" : "слов"}
             {tooShort && ` · нужно минимум ${MIN_WORDS}`}
             {tooLong && ` · максимум ${MAX_WORDS}`}
           </span>
