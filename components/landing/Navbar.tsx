@@ -5,8 +5,8 @@ import { LinkButton } from "@/components/ui/Button"
 export function Navbar() {
   return (
     <header className="sticky top-0 z-30 w-full border-b border-zinc-200/70 bg-white/80 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <Link href="/" className="flex items-center gap-2">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
+        <Link href="/" className="flex flex-shrink-0 items-center gap-2">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-900 text-white">
             <Sparkles className="h-4 w-4" />
           </span>
@@ -20,8 +20,13 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <LinkButton href="/login" variant="ghost" size="sm">Войти</LinkButton>
-          <LinkButton href="/signup" size="sm">Начать бесплатно</LinkButton>
+          <div className="hidden sm:block">
+            <LinkButton href="/login" variant="ghost" size="sm">Войти</LinkButton>
+          </div>
+          <LinkButton href="/signup" size="sm">
+            <span className="hidden sm:inline">Начать бесплатно</span>
+            <span className="sm:hidden">Начать</span>
+          </LinkButton>
         </div>
       </div>
     </header>

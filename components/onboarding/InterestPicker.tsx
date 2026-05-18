@@ -53,18 +53,18 @@ export function InterestPicker({ initialInterests = [], initialLevel = "B1" }: P
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl">
+    <div className="mx-auto w-full max-w-4xl pb-32 sm:pb-0">
       <div className="text-center">
         <p className="text-xs font-semibold tracking-[0.2em] text-zinc-500 uppercase">Шаг 1 из 1</p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
+        <h1 className="mt-3 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl md:text-4xl">
           Выбери свои интересы
         </h1>
-        <p className="mt-3 text-base text-zinc-600">
+        <p className="mt-3 text-sm text-zinc-600 sm:text-base">
           Минимум {MIN_INTERESTS}. ИИ будет генерировать эссе на выбранные тобой темы.
         </p>
       </div>
 
-      <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="mt-8 grid grid-cols-2 gap-3 sm:mt-10 sm:grid-cols-3 lg:grid-cols-4">
         {INTERESTS.map((interest) => {
           const Icon = interest.icon
           const isActive = selected.has(interest.slug)
@@ -74,7 +74,7 @@ export function InterestPicker({ initialInterests = [], initialLevel = "B1" }: P
               type="button"
               onClick={() => toggle(interest.slug)}
               className={cn(
-                "group relative cursor-pointer rounded-2xl border bg-white p-5 text-left transition-all",
+                "group relative cursor-pointer rounded-2xl border bg-white p-4 text-left transition-all sm:p-5",
                 isActive
                   ? "border-blue-500 ring-2 ring-blue-500/20"
                   : "border-zinc-200 hover:border-zinc-300"
@@ -88,8 +88,8 @@ export function InterestPicker({ initialInterests = [], initialLevel = "B1" }: P
               <span className={cn("flex h-9 w-9 items-center justify-center rounded-lg", interest.accent)}>
                 <Icon className={cn("h-4.5 w-4.5", interest.iconColor)} />
               </span>
-              <h3 className="mt-4 text-[15px] font-semibold text-zinc-900">{interest.label}</h3>
-              <p className="mt-1 text-[13px] leading-5 text-zinc-500">{interest.description}</p>
+              <h3 className="mt-3 text-[14px] font-semibold text-zinc-900 sm:mt-4 sm:text-[15px]">{interest.label}</h3>
+              <p className="mt-1 text-[12px] leading-5 text-zinc-500 sm:text-[13px]">{interest.description}</p>
             </button>
           )
         })}
@@ -121,13 +121,26 @@ export function InterestPicker({ initialInterests = [], initialLevel = "B1" }: P
         <p className="mt-5 rounded-lg bg-red-50 px-4 py-3 text-center text-sm text-red-700">{error}</p>
       )}
 
-      <div className="mt-8 flex items-center justify-between gap-4">
+      {/* Десктоп: статичная кнопка снизу. */}
+      <div className="mt-8 hidden items-center justify-between gap-4 sm:flex">
         <p className="text-sm text-zinc-500">
           Выбрано: <span className="font-semibold text-zinc-900">{selected.size}</span> / 12
         </p>
         <Button onClick={submit} disabled={isPending} size="lg">
           {isPending ? "Сохраняем…" : "Перейти в приложение"}
         </Button>
+      </div>
+
+      {/* Мобила: фиксированная панель снизу с CTA, чтобы не скроллить вниз. */}
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-zinc-200 bg-white/95 px-4 py-3 backdrop-blur sm:hidden">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs text-zinc-500">
+            Выбрано: <span className="font-semibold text-zinc-900">{selected.size}</span> / 12
+          </p>
+          <Button onClick={submit} disabled={isPending} size="md">
+            {isPending ? "Сохраняем…" : "Продолжить"}
+          </Button>
+        </div>
       </div>
     </div>
   )

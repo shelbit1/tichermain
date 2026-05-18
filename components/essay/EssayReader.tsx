@@ -70,7 +70,7 @@ export function EssayReader({ content }: Props) {
 
   return (
     <div ref={containerRef} className="relative">
-      <div className="space-y-5 text-[17px] leading-8 text-zinc-800">
+      <div className="space-y-5 text-[16px] leading-7 text-zinc-800 sm:text-[17px] sm:leading-8">
         {paragraphs.map((para, pi) => {
           const tokens = para.split(/(\s+)/)
           return (
@@ -107,14 +107,16 @@ export function EssayReader({ content }: Props) {
 }
 
 function Tooltip({ data }: { data: ActiveWord }) {
-  const top = data.rect.top + window.scrollY - 44
-  const left = data.rect.left + window.scrollX + data.rect.width / 2
+  // Используем viewport-координаты напрямую (position: fixed),
+  // чтобы тултип не зависел от оффсета родительского контейнера.
+  const top = data.rect.top - 44
+  const left = data.rect.left + data.rect.width / 2
 
   return (
     <div
       data-word-tooltip
-      style={{ top, left, transform: "translate(-50%, 0)" }}
-      className="pointer-events-none absolute z-30 rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white shadow-lg"
+      style={{ position: "fixed", top, left, transform: "translate(-50%, 0)" }}
+      className="pointer-events-none z-30 rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white shadow-lg"
     >
       {data.loading ? (
         <span className="flex items-center gap-1.5">

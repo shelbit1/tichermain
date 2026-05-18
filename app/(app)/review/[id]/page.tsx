@@ -33,16 +33,16 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
   const review = written.review as unknown as EssayReview
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
       <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900">
         <ArrowLeft className="h-4 w-4" />
         К списку
       </Link>
 
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+      <div className="mt-6 flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs font-semibold tracking-[0.18em] text-zinc-500 uppercase">Отчёт</p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight text-zinc-900">
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
             Проверка эссе
           </h1>
           <p className="mt-1 text-sm text-zinc-500">
@@ -50,14 +50,14 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
           </p>
         </div>
         {written.sourceEssayId && (
-          <LinkButton href={`/essay/${written.sourceEssayId}/write`} variant="outline">
+          <LinkButton href={`/essay/${written.sourceEssayId}/write`} variant="outline" className="w-full sm:w-auto">
             <Plus className="h-4 w-4" />
             Написать ещё
           </LinkButton>
         )}
       </div>
 
-      <div className="mt-10">
+      <div className="mt-8 sm:mt-10">
         <ReviewReport
           review={review}
           topic={written.topic}

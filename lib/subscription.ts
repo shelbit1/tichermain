@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma"
 import type { Subscription } from "@prisma/client"
 
-export const FREE_ESSAY_LIMIT = 3
+export const FREE_ESSAY_LIMIT = 10
 export const TRIAL_DURATION_HOURS = 24
 export const SUBSCRIPTION_PRICE_KOPECKS = 49000 // 490 ₽
 

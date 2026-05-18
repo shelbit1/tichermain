@@ -29,14 +29,14 @@ const FEATURES = [
 
 export function Features() {
   return (
-    <section id="features" className="border-t border-zinc-200/70 bg-white py-24">
-      <div className="mx-auto max-w-5xl px-6">
+    <section id="features" className="border-t border-zinc-200/70 bg-white py-16 sm:py-24">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6">
         <p className="text-center text-xs font-semibold tracking-[0.2em] text-zinc-500 uppercase">Возможности</p>
-        <h2 className="mt-3 text-center text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
+        <h2 className="mt-3 text-center text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl md:text-4xl">
           Всё для комфортного чтения
         </h2>
 
-        <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid grid-cols-1 gap-4 sm:mt-12 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
           {FEATURES.map((f) => (
             <div
               key={f.title}

@@ -22,7 +22,7 @@ export default async function OnboardingPage() {
   return (
     <div className="min-h-screen bg-[#fafaf9] pb-20">
       <header className="border-b border-zinc-200/70 bg-white/80 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center px-6">
+        <div className="mx-auto flex h-16 max-w-6xl items-center px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-900 text-white">
               <Sparkles className="h-4 w-4" />
@@ -32,7 +32,7 @@ export default async function OnboardingPage() {
         </div>
       </header>
 
-      <div className="px-6 pt-16">
+      <div className="px-4 pt-10 sm:px-6 sm:pt-16">
         <InterestPicker
           initialInterests={(user?.interests || []) as InterestSlug[]}
           initialLevel={(user?.level as EnglishLevel) || "B1"}

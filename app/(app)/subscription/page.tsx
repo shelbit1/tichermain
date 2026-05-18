@@ -29,13 +29,13 @@ export default async function SubscriptionPage({
   ])
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
       <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900">
         <ArrowLeft className="h-4 w-4" />
         Назад
       </Link>
 
-      <h1 className="mt-6 text-3xl font-semibold tracking-tight text-zinc-900">Подписка</h1>
+      <h1 className="mt-6 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Подписка</h1>
 
       {params.status === "success" && (
         <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
@@ -89,13 +89,13 @@ export default async function SubscriptionPage({
         </div>
       </div>
 
-      <div className="mt-8 rounded-2xl border-2 border-blue-500/70 bg-white p-8">
+      <div className="mt-8 rounded-2xl border-2 border-blue-500/70 bg-white p-6 sm:p-8">
         <p className="text-xs font-semibold tracking-[0.2em] text-zinc-600 uppercase">
           Тичер AI Premium
         </p>
         <div className="mt-4 flex items-end gap-2">
           <span className="text-2xl font-medium text-zinc-700">₽</span>
-          <span className="text-6xl font-semibold tracking-tight text-zinc-900">490</span>
+          <span className="text-5xl font-semibold tracking-tight text-zinc-900 sm:text-6xl">490</span>
           <span className="mb-2 text-sm text-zinc-500">/ месяц</span>
         </div>
 

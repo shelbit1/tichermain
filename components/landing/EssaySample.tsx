@@ -16,14 +16,14 @@ export function EssaySample() {
   const [activeWord, setActiveWord] = useState<string | null>("Remote")
 
   return (
-    <div className="relative rounded-2xl border border-zinc-200 bg-white p-7 shadow-sm">
+    <div className="relative rounded-2xl border border-zinc-200 bg-white p-5 text-left shadow-sm sm:p-7">
       <p className="text-[11px] font-semibold tracking-[0.18em] text-zinc-400 uppercase">Пример эссе</p>
 
-      <div className="mt-5 flex items-center gap-2">
+      <div className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-1">
         <FileText className="h-4 w-4 text-zinc-500" />
         <span className="text-sm text-zinc-500">Тема:</span>
         <span className="text-sm font-semibold text-zinc-900">The Future of Remote Work</span>
-        <span className="ml-1 rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+        <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
           B2
         </span>
       </div>

@@ -4,7 +4,7 @@ import { Plus, BookOpen, Sparkles, PenLine } from "lucide-react"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { INTERESTS, getInterest, type InterestSlug } from "@/lib/interests"
-import { getAccessState } from "@/lib/subscription"
+import { getAccessState, FREE_ESSAY_LIMIT } from "@/lib/subscription"
 import { LinkButton } from "@/components/ui/Button"
 
 export default async function DashboardPage() {
@@ -46,28 +46,28 @@ export default async function DashboardPage() {
     .filter((i): i is NonNullable<typeof i> => Boolean(i))
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-12">
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
       <div className="flex flex-col gap-1.5">
         <p className="text-xs font-semibold tracking-[0.2em] text-zinc-500 uppercase">
           Уровень {user.level}
         </p>
-        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">
+        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
           Привет{user.name ? `, ${user.name.split(" ")[0]}` : ""}!
         </h1>
-        <p className="mt-1 text-base text-zinc-600">
+        <p className="mt-1 text-sm text-zinc-600 sm:text-base">
           {access.isPaid
             ? "Premium активен. Создавай и проверяй эссе без ограничений."
-            : `Бесплатных действий осталось: ${access.essaysRemaining} из 3.`}
+            : `Бесплатных действий осталось: ${access.essaysRemaining} из ${FREE_ESSAY_LIMIT}.`}
         </p>
       </div>
 
-      <div className="mt-8 flex flex-wrap items-center gap-3">
-        <LinkButton href="/essay/new" size="lg">
+      <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center">
+        <LinkButton href="/essay/new" size="lg" className="w-full sm:w-auto">
           <Plus className="h-4 w-4" />
           Новое эссе
         </LinkButton>
         {!access.isPaid && (
-          <LinkButton href="/subscription" variant="outline" size="lg">
+          <LinkButton href="/subscription" variant="outline" size="lg" className="w-full sm:w-auto">
             <Sparkles className="h-4 w-4" />
             Получить Premium
           </LinkButton>
@@ -75,9 +75,9 @@ export default async function DashboardPage() {
       </div>
 
       {/* Сетка интересов пользователя — быстрый старт по теме */}
-      <section className="mt-14">
+      <section className="mt-10 sm:mt-14">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-xl font-semibold tracking-tight text-zinc-900">Твои интересы</h2>
+          <h2 className="text-lg font-semibold tracking-tight text-zinc-900 sm:text-xl">Твои интересы</h2>
           <Link href="/onboarding" className="text-sm text-zinc-500 hover:text-zinc-900">
             Изменить
           </Link>
@@ -112,8 +112,8 @@ export default async function DashboardPage() {
       </section>
 
       {reviews.length > 0 && (
-        <section className="mt-14">
-          <h2 className="text-xl font-semibold tracking-tight text-zinc-900">Мои проверки</h2>
+        <section className="mt-10 sm:mt-14">
+          <h2 className="text-lg font-semibold tracking-tight text-zinc-900 sm:text-xl">Мои проверки</h2>
           <ul className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {reviews.map((r) => {
               const tone =
@@ -163,8 +163,8 @@ export default async function DashboardPage() {
         </section>
       )}
 
-      <section className="mt-14">
-        <h2 className="text-xl font-semibold tracking-tight text-zinc-900">История эссе</h2>
+      <section className="mt-10 sm:mt-14">
+        <h2 className="text-lg font-semibold tracking-tight text-zinc-900 sm:text-xl">История эссе</h2>
         {essays.length === 0 ? (
           <div className="mt-5 rounded-2xl border border-dashed border-zinc-300 bg-white p-10 text-center">
             <BookOpen className="mx-auto h-8 w-8 text-zinc-400" />

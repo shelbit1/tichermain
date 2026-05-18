@@ -21,7 +21,7 @@ export default async function WriteEssayPage({ params }: { params: Promise<{ id:
   const access = await getAccessState(session.user.id)
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
       <Link
         href={`/essay/${essay.id}`}
         className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900"
@@ -29,8 +29,8 @@ export default async function WriteEssayPage({ params }: { params: Promise<{ id:
         <ArrowLeft className="h-4 w-4" />К исходному эссе
       </Link>
 
-      <h1 className="mt-6 text-3xl font-semibold tracking-tight text-zinc-900">Напиши своё эссе</h1>
-      <p className="mt-2 text-base text-zinc-600">
+      <h1 className="mt-6 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Напиши своё эссе</h1>
+      <p className="mt-2 text-sm text-zinc-600 sm:text-base">
         Напиши эссе на эту же тему на английском. ИИ проверит грамматику, лексику и стиль, выставит оценку 0–100 и подскажет, что улучшить.
       </p>
 

@@ -12,15 +12,15 @@ export default async function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#fafaf9] px-6 py-12">
-      <Link href="/" className="mb-10 flex items-center gap-2">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#fafaf9] px-4 py-8 sm:px-6 sm:py-12">
+      <Link href="/" className="mb-8 flex items-center gap-2 sm:mb-10">
         <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-900 text-white">
           <Sparkles className="h-4 w-4" />
         </span>
         <span className="text-lg font-semibold tracking-tight">Тичер AI</span>
       </Link>
 
-      <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm">
+      <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8">
         <h1 className="text-center text-2xl font-semibold tracking-tight text-zinc-900">
           Войти в Тичер AI
         </h1>

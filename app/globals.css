@@ -17,9 +17,25 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  /* iOS Safari: запретить горизонтальный скролл при свайпах. */
+  overscroll-behavior-x: none;
+}
+
+html {
+  /* iOS Safari: не зумить страницу при фокусе на input/textarea (если font-size < 16px). */
+  -webkit-text-size-adjust: 100%;
 }
 
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Все input/textarea — минимум 16px на мобиле, иначе iOS Safari делает зум при фокусе. */
+@media (max-width: 640px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
 }

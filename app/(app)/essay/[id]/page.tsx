@@ -30,13 +30,13 @@ export default async function EssayPage({ params }: { params: Promise<{ id: stri
   const interest = essay.interest ? getInterest(essay.interest as InterestSlug) : null
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
       <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900">
         <ArrowLeft className="h-4 w-4" />
         К списку эссе
       </Link>
 
-      <div className="mt-6 flex items-center gap-2">
+      <div className="mt-6 flex flex-wrap items-center gap-2">
         {essay.level && (
           <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
             {essay.level}
@@ -50,7 +50,7 @@ export default async function EssayPage({ params }: { params: Promise<{ id: stri
         </span>
       </div>
 
-      <h1 className="mt-4 text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
+      <h1 className="mt-4 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl md:text-4xl">
         {essay.title}
       </h1>
 
@@ -58,21 +58,21 @@ export default async function EssayPage({ params }: { params: Promise<{ id: stri
         Нажми на любое слово, чтобы увидеть перевод через DeepL.
       </p>
 
-      <div className="mt-10">
+      <div className="mt-8 sm:mt-10">
         <EssayReader content={essay.content} />
       </div>
 
-      <div className="mt-14 rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
+      <div className="mt-12 rounded-2xl border border-zinc-200 bg-white p-5 sm:mt-14 sm:p-8">
         <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="max-w-md">
-            <h2 className="text-lg font-semibold tracking-tight text-zinc-900">
+            <h2 className="text-base font-semibold tracking-tight text-zinc-900 sm:text-lg">
               А теперь напиши своё эссе на эту тему
             </h2>
             <p className="mt-1 text-sm text-zinc-600">
               ИИ проверит грамматику, лексику и стиль, выставит балл и подскажет, что улучшить.
             </p>
           </div>
-          <LinkButton href={`/essay/${essay.id}/write`} size="lg" className="flex-shrink-0">
+          <LinkButton href={`/essay/${essay.id}/write`} size="lg" className="w-full flex-shrink-0 sm:w-auto">
             <PenLine className="h-4 w-4" />
             Написать эссе
           </LinkButton>

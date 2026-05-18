@@ -22,9 +22,9 @@ export function ReviewReport({ review, topic, content, wordCount }: Props) {
     <div className="space-y-8">
       <ScoreHeader score={review.score} level={review.estimatedLevel} summary={review.summary} />
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-3 sm:gap-5">
         <Stat label="Слов" value={wordCount.toString()} />
-        <Stat label="Уровень по ИИ" value={review.estimatedLevel} />
+        <Stat label="Уровень" value={review.estimatedLevel} />
         <Stat label="Замечаний" value={review.corrections.length.toString()} />
       </div>
 
@@ -83,10 +83,10 @@ function ScoreHeader({
   const offset = circumference - (score / 100) * circumference
 
   return (
-    <div className="rounded-3xl border border-zinc-200 bg-white p-8">
-      <div className="flex flex-col items-center gap-6 sm:flex-row sm:gap-8">
+    <div className="rounded-3xl border border-zinc-200 bg-white p-5 sm:p-8">
+      <div className="flex flex-col items-center gap-5 sm:flex-row sm:gap-8">
         <div className="relative flex-shrink-0">
-          <svg width="140" height="140" viewBox="0 0 120 120" className="-rotate-90">
+          <svg width="120" height="120" viewBox="0 0 120 120" className="-rotate-90 sm:h-[140px] sm:w-[140px]">
             <circle cx="60" cy="60" r={radius} className="fill-none stroke-zinc-100" strokeWidth="10" />
             <circle
               cx="60"
@@ -112,8 +112,8 @@ function ScoreHeader({
               Уровень {level}
             </span>
           </div>
-          <h2 className="mt-3 text-xl font-semibold tracking-tight text-zinc-900">Оценка эссе</h2>
-          {summary && <p className="mt-2 text-[15px] leading-7 text-zinc-700">{summary}</p>}
+          <h2 className="mt-3 text-lg font-semibold tracking-tight text-zinc-900 sm:text-xl">Оценка эссе</h2>
+          {summary && <p className="mt-2 text-sm leading-6 text-zinc-700 sm:text-[15px] sm:leading-7">{summary}</p>}
         </div>
       </div>
     </div>
@@ -122,9 +122,11 @@ function ScoreHeader({
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-5">
-      <p className="text-xs font-semibold tracking-[0.18em] text-zinc-500 uppercase">{label}</p>
-      <p className="mt-2 text-2xl font-semibold text-zinc-900">{value}</p>
+    <div className="rounded-2xl border border-zinc-200 bg-white p-3 sm:p-5">
+      <p className="text-[10px] font-semibold tracking-[0.14em] text-zinc-500 uppercase sm:text-xs sm:tracking-[0.18em]">
+        {label}
+      </p>
+      <p className="mt-1 text-lg font-semibold text-zinc-900 sm:mt-2 sm:text-2xl">{value}</p>
     </div>
   )
 }
@@ -146,7 +148,7 @@ function BulletCard({
       : { border: "border-amber-200", bg: "bg-amber-50/50", icon: "text-amber-600", iconBg: "bg-amber-100" }
 
   return (
-    <div className={`rounded-2xl border ${colors.border} ${colors.bg} p-6`}>
+    <div className={`rounded-2xl border ${colors.border} ${colors.bg} p-5 sm:p-6`}>
       <div className="flex items-center gap-2">
         <span className={`flex h-8 w-8 items-center justify-center rounded-lg ${colors.iconBg} ${colors.icon}`}>
           {icon}
@@ -193,20 +195,20 @@ function CorrectionsSection({ items }: { items: EssayReviewCorrection[] }) {
         {items.map((c, i) => {
           const meta = CORRECTION_META[c.type]
           return (
-            <div key={i} className="rounded-2xl border border-zinc-200 bg-white p-5">
+            <div key={i} className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5">
               <span className={`inline-flex rounded-md px-2 py-0.5 text-[11px] font-semibold ${meta.bg} ${meta.text}`}>
                 {meta.label}
               </span>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div className="mt-3 grid gap-2 sm:grid-cols-2 sm:gap-3">
                 <div className="rounded-lg bg-rose-50 px-3 py-2">
                   <p className="text-[11px] font-semibold tracking-wide text-rose-700 uppercase">было</p>
-                  <p className="mt-1 text-sm text-zinc-900 line-through decoration-rose-400/60">
+                  <p className="mt-1 text-sm break-words text-zinc-900 line-through decoration-rose-400/60">
                     {c.original}
                   </p>
                 </div>
                 <div className="rounded-lg bg-emerald-50 px-3 py-2">
                   <p className="text-[11px] font-semibold tracking-wide text-emerald-700 uppercase">стало</p>
-                  <p className="mt-1 text-sm font-medium text-zinc-900">{c.corrected}</p>
+                  <p className="mt-1 text-sm font-medium break-words text-zinc-900">{c.corrected}</p>
                 </div>
               </div>
               {c.explanation && (
@@ -232,7 +234,7 @@ function VocabularySection({ items }: { items: EssayReview["vocabularySuggestion
 
       <ul className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {items.map((v, i) => (
-          <li key={i} className="rounded-2xl border border-zinc-200 bg-white p-5">
+          <li key={i} className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5">
             <div className="flex flex-wrap items-center gap-2 text-sm">
               <span className="rounded bg-zinc-100 px-2 py-0.5 font-medium text-zinc-700">{v.original}</span>
               <span className="text-zinc-400">→</span>
@@ -248,30 +250,32 @@ function VocabularySection({ items }: { items: EssayReview["vocabularySuggestion
 
 function AdviceCard({ advice }: { advice: string }) {
   return (
-    <section className="rounded-2xl border border-blue-200 bg-blue-50/60 p-6">
+    <section className="rounded-2xl border border-blue-200 bg-blue-50/60 p-5 sm:p-6">
       <div className="flex items-center gap-2">
         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
           <Lightbulb className="h-4 w-4" />
         </span>
         <h3 className="text-base font-semibold text-zinc-900">Совет от ИИ</h3>
       </div>
-      <p className="mt-3 text-[15px] leading-7 text-zinc-800">{advice}</p>
+      <p className="mt-3 text-sm leading-6 text-zinc-800 sm:text-[15px] sm:leading-7">{advice}</p>
     </section>
   )
 }
 
 function EssayPreview({ topic, content }: { topic: string; content: string }) {
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-6">
+    <section className="rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6">
       <div className="flex items-center gap-2 text-xs font-semibold tracking-[0.18em] text-zinc-500 uppercase">
         <Quote className="h-3.5 w-3.5" />
         Твой текст
       </div>
-      <div className="mt-3 flex items-center gap-2 text-sm text-zinc-600">
-        <Type className="h-4 w-4" />
-        <span>Тема: {topic}</span>
+      <div className="mt-3 flex items-start gap-2 text-sm text-zinc-600">
+        <Type className="mt-0.5 h-4 w-4 flex-shrink-0" />
+        <span className="break-words">Тема: {topic}</span>
       </div>
-      <p className="mt-4 whitespace-pre-wrap text-[15px] leading-7 text-zinc-800">{content}</p>
+      <p className="mt-4 text-sm leading-6 whitespace-pre-wrap text-zinc-800 sm:text-[15px] sm:leading-7">
+        {content}
+      </p>
     </section>
   )
 }

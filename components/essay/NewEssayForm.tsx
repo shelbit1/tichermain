@@ -123,6 +123,12 @@ export function NewEssayForm({ defaultLevel, userInterests }: Props) {
       <Button size="lg" onClick={submit} disabled={pending} className="w-full sm:w-auto">
         {pending ? "Генерирую эссе…" : "Сгенерировать эссе"}
       </Button>
+
+      {pending && (
+        <p className="text-center text-sm text-zinc-500 sm:text-left">
+          Это займёт 10–20 секунд
+        </p>
+      )}
     </div>
   )
 }

@@ -23,14 +23,14 @@ export default async function NewEssayPage() {
   const access = await getAccessState(session.user.id)
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
       <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900">
         <ArrowLeft className="h-4 w-4" />
         Назад
       </Link>
 
-      <h1 className="mt-6 text-3xl font-semibold tracking-tight text-zinc-900">Новое эссе</h1>
-      <p className="mt-2 text-base text-zinc-600">
+      <h1 className="mt-6 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Новое эссе</h1>
+      <p className="mt-2 text-sm text-zinc-600 sm:text-base">
         ИИ напишет эссе под выбранную тему и уровень. Длина 200–300 слов.
       </p>
 

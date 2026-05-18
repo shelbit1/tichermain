@@ -82,13 +82,15 @@ export function WriteEssayForm({ sourceEssayId, topic }: Props) {
         <p className="mt-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
       )}
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <Button onClick={submit} disabled={!canSubmit} size="lg">
+      <div className="mt-6 flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <Button onClick={submit} disabled={!canSubmit} size="lg" className="w-full sm:w-auto">
           <Sparkles className="h-4 w-4" />
           {pending ? "Проверяю эссе…" : "Проверить с ИИ"}
         </Button>
         {pending && (
-          <span className="text-sm text-zinc-500">Это займёт 10–20 секунд</span>
+          <span className="text-center text-sm text-zinc-500 sm:text-left">
+            Это займёт 10–20 секунд
+          </span>
         )}
       </div>
     </div>
