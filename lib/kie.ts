@@ -70,12 +70,23 @@ export async function generateEssay({ topic, level }: GenerateEssayParams): Prom
     }),
   })
 
+  const rawBody = await res.text()
+
   if (!res.ok) {
-    const text = await res.text().catch(() => "")
-    throw new Error(`KIE AI error ${res.status}: ${text}`)
+    throw new Error(`KIE AI error ${res.status}: ${rawBody.slice(0, 500)}`)
   }
 
-  const data = (await res.json()) as AnthropicResponse
+  let data: AnthropicResponse
+  try {
+    data = JSON.parse(rawBody) as AnthropicResponse
+  } catch {
+    console.error("[kie.generate] non-JSON response", {
+      status: res.status,
+      contentType: res.headers.get("content-type"),
+      bodyPreview: rawBody.slice(0, 500),
+    })
+    throw new Error("KIE AI returned non-JSON response")
+  }
 
   if (data.error) {
     throw new Error(`KIE AI error: ${data.error.message || data.error.type}`)
@@ -83,7 +94,12 @@ export async function generateEssay({ topic, level }: GenerateEssayParams): Prom
 
   const raw = data.content?.find((c) => c.type === "text")?.text
   if (typeof raw !== "string" || raw.length === 0) {
-    console.error("[kie.generate] empty text content", describeKieResponse(data, "generate"))
+    console.error("[kie.generate] empty text content", {
+      ...describeKieResponse(data, "generate"),
+      contentType: res.headers.get("content-type"),
+      topLevelKeys: Object.keys(data ?? {}),
+      bodyPreview: rawBody.slice(0, 800),
+    })
     throw new Error("KIE AI returned no text content")
   }
 
