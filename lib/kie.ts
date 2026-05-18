@@ -17,8 +17,26 @@ type AnthropicResponse = {
   role?: string
   type?: string
   stop_reason?: string
+  model?: string
+  usage?: Record<string, unknown>
   content?: Array<{ type: string; text?: string }>
   error?: { message?: string; type?: string }
+}
+
+// Безопасное превью ответа KIE для логов: без ключей, без длинных текстов.
+function describeKieResponse(data: AnthropicResponse, label: string) {
+  return {
+    label,
+    model: data.model,
+    stop_reason: data.stop_reason,
+    usage: data.usage,
+    contentBlocks: Array.isArray(data.content)
+      ? data.content.map((c) => ({
+          type: c?.type,
+          textLength: typeof c?.text === "string" ? c.text.length : 0,
+        }))
+      : null,
+  }
 }
 
 export async function generateEssay({ topic, level }: GenerateEssayParams): Promise<GeneratedEssay> {
@@ -65,6 +83,7 @@ export async function generateEssay({ topic, level }: GenerateEssayParams): Prom
 
   const raw = data.content?.find((c) => c.type === "text")?.text
   if (typeof raw !== "string" || raw.length === 0) {
+    console.error("[kie.generate] empty text content", describeKieResponse(data, "generate"))
     throw new Error("KIE AI returned no text content")
   }
 
@@ -187,6 +206,7 @@ export async function reviewEssay({ topic, userLevel, essay }: ReviewEssayParams
 
   const raw = data.content?.find((c) => c.type === "text")?.text
   if (typeof raw !== "string" || raw.length === 0) {
+    console.error("[kie.review] empty text content", describeKieResponse(data, "review"))
     throw new Error("KIE AI review returned no text content")
   }
 

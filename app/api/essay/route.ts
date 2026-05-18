@@ -5,6 +5,9 @@ import { generateEssay } from "@/lib/kie"
 import { getAccessState } from "@/lib/subscription"
 import { INTERESTS, getInterest, isValidInterestSlug, isValidLevel } from "@/lib/interests"
 
+// KIE-генерация бывает 15–25 с; защищаемся от дефолтного 10-секундного лимита Vercel.
+export const maxDuration = 60
+
 function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]
 }
