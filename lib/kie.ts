@@ -39,6 +39,19 @@ function describeKieResponse(data: AnthropicResponse, label: string) {
   }
 }
 
+// Отпечаток ключа: первые/последние 4 символа + длина. Секрет не утекает,
+// но можно сверить, тот ли это ключ, что в локальном .env.
+function fingerprintKey(key: string | undefined) {
+  if (!key) return { present: false }
+  return {
+    present: true,
+    length: key.length,
+    head: key.slice(0, 4),
+    tail: key.slice(-4),
+    hasWhitespace: /\s/.test(key),
+  }
+}
+
 export async function generateEssay({ topic, level }: GenerateEssayParams): Promise<GeneratedEssay> {
   const apiKey = process.env.KIE_AI_API_KEY
   const model = process.env.KIE_AI_MODEL || "claude-sonnet-4-6"
@@ -96,6 +109,9 @@ export async function generateEssay({ topic, level }: GenerateEssayParams): Prom
   if (typeof raw !== "string" || raw.length === 0) {
     console.error("[kie.generate] empty text content", {
       ...describeKieResponse(data, "generate"),
+      endpoint: KIE_ENDPOINT,
+      requestModel: model,
+      apiKey: fingerprintKey(apiKey),
       contentType: res.headers.get("content-type"),
       topLevelKeys: Object.keys(data ?? {}),
       bodyPreview: rawBody.slice(0, 800),
