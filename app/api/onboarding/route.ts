@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
-import { isValidInterestSlug, isValidLevel } from "@/lib/interests"
+import { isValidInterestSlug } from "@/lib/interests"
 
 export async function POST(req: Request) {
   const session = await auth()
@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   }
 
   const body = (await req.json().catch(() => null)) as
-    | { interests?: unknown; level?: unknown }
+    | { interests?: unknown }
     | null
   if (!body) return NextResponse.json({ error: "Invalid body" }, { status: 400 })
 
@@ -24,13 +24,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Выбери минимум 3 интереса" }, { status: 400 })
   }
 
-  const level = typeof body.level === "string" && isValidLevel(body.level) ? body.level : "B1"
-
+  // Уровень в онбординге больше не запрашиваем — он выбирается на каждом эссе.
+  // В User.level остаётся дефолт схемы ("B1").
   await prisma.user.update({
     where: { id: session.user.id },
     data: {
       interests: uniqueInterests,
-      level,
       onboardedAt: new Date(),
     },
   })

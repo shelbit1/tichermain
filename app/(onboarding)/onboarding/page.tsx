@@ -4,7 +4,7 @@ import { Sparkles } from "lucide-react"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { InterestPicker } from "@/components/onboarding/InterestPicker"
-import type { EnglishLevel, InterestSlug } from "@/lib/interests"
+import type { InterestSlug } from "@/lib/interests"
 
 export default async function OnboardingPage() {
   const session = await auth()
@@ -12,7 +12,7 @@ export default async function OnboardingPage() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { interests: true, level: true, onboardedAt: true },
+    select: { interests: true, onboardedAt: true },
   })
 
   if (user?.onboardedAt) {
@@ -33,10 +33,7 @@ export default async function OnboardingPage() {
       </header>
 
       <div className="px-4 pt-10 sm:px-6 sm:pt-16">
-        <InterestPicker
-          initialInterests={(user?.interests || []) as InterestSlug[]}
-          initialLevel={(user?.level as EnglishLevel) || "B1"}
-        />
+        <InterestPicker initialInterests={(user?.interests || []) as InterestSlug[]} />
       </div>
     </div>
   )

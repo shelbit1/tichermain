@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { Check } from "lucide-react"
-import { INTERESTS, ENGLISH_LEVELS, type EnglishLevel, type InterestSlug } from "@/lib/interests"
+import { INTERESTS, type InterestSlug } from "@/lib/interests"
 import { Button } from "@/components/ui/Button"
 import { cn } from "@/lib/utils"
 
@@ -11,13 +11,11 @@ const MIN_INTERESTS = 3
 
 type Props = {
   initialInterests?: InterestSlug[]
-  initialLevel?: EnglishLevel
 }
 
-export function InterestPicker({ initialInterests = [], initialLevel = "B1" }: Props) {
+export function InterestPicker({ initialInterests = [] }: Props) {
   const router = useRouter()
   const [selected, setSelected] = useState<Set<InterestSlug>>(new Set(initialInterests))
-  const [level, setLevel] = useState<EnglishLevel>(initialLevel)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -40,7 +38,7 @@ export function InterestPicker({ initialInterests = [], initialLevel = "B1" }: P
       const res = await fetch("/api/onboarding", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ interests: Array.from(selected), level }),
+        body: JSON.stringify({ interests: Array.from(selected) }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
@@ -93,28 +91,6 @@ export function InterestPicker({ initialInterests = [], initialLevel = "B1" }: P
             </button>
           )
         })}
-      </div>
-
-      <div className="mt-10 rounded-2xl border border-zinc-200 bg-white p-6">
-        <p className="text-sm font-semibold text-zinc-900">Уровень английского</p>
-        <p className="mt-1 text-sm text-zinc-500">Эссе будут адаптированы под твой уровень.</p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {ENGLISH_LEVELS.map((lvl) => (
-            <button
-              key={lvl}
-              type="button"
-              onClick={() => setLevel(lvl)}
-              className={cn(
-                "h-10 cursor-pointer rounded-lg border px-5 text-sm font-medium transition-colors",
-                level === lvl
-                  ? "border-blue-600 bg-blue-600 text-white"
-                  : "border-zinc-300 bg-white text-zinc-700 hover:border-zinc-400"
-              )}
-            >
-              {lvl}
-            </button>
-          ))}
-        </div>
       </div>
 
       {error && (
