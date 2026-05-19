@@ -51,12 +51,12 @@ export async function POST(req: Request) {
   if (sourceEssayId) {
     const source = await prisma.essay.findUnique({
       where: { id: sourceEssayId },
-      select: { userId: true, topic: true, title: true, language: true },
+      select: { userId: true, title: true, language: true },
     })
     if (!source || source.userId !== session.user.id) {
       return NextResponse.json({ error: "Source essay not found" }, { status: 404 })
     }
-    topic = source.topic || source.title
+    topic = source.title
     languageSlug = source.language
   } else if (typeof body.language === "string" && isValidLanguageSlug(body.language)) {
     languageSlug = body.language

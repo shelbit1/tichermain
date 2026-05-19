@@ -15,7 +15,7 @@ export default async function WriteEssayPage({ params }: { params: Promise<{ id:
 
   const essay = await prisma.essay.findUnique({
     where: { id },
-    select: { id: true, title: true, topic: true, userId: true, language: true },
+    select: { id: true, title: true, userId: true, language: true },
   })
   if (!essay || essay.userId !== session.user.id) notFound()
 
@@ -50,7 +50,7 @@ export default async function WriteEssayPage({ params }: { params: Promise<{ id:
         <div className="mt-10">
           <WriteEssayForm
             sourceEssayId={essay.id}
-            topic={essay.topic || essay.title}
+            topic={essay.title}
             languageLabel={language.label}
           />
         </div>
