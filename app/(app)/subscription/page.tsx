@@ -5,9 +5,12 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { getAccessState } from "@/lib/subscription"
 import { CheckoutButton } from "@/components/subscription/CheckoutButton"
+import { TPayBadge } from "@/components/legal/TPayBadge"
+import { LEGAL } from "@/lib/legal"
 
 const PERKS = [
-  "Неограниченная генерация эссе",
+  "Доступ ко всем языкам: английский, азербайджанский, испанский, китайский",
+  "Неограниченная генерация и проверка эссе",
   "Все уровни сложности (A1–C2)",
   "Перевод слов через DeepL",
   "История и личный словарь",
@@ -91,11 +94,13 @@ export default async function SubscriptionPage({
 
       <div className="mt-8 rounded-2xl border-2 border-blue-500/70 bg-white p-6 sm:p-8">
         <p className="text-xs font-semibold tracking-[0.2em] text-zinc-600 uppercase">
-          Тичер AI Premium
+          Подписка Тичер AI
         </p>
         <div className="mt-4 flex items-end gap-2">
           <span className="text-2xl font-medium text-zinc-700">₽</span>
-          <span className="text-5xl font-semibold tracking-tight text-zinc-900 sm:text-6xl">490</span>
+          <span className="text-5xl font-semibold tracking-tight text-zinc-900 sm:text-6xl">
+            {LEGAL.monthlyPriceRub}
+          </span>
           <span className="mb-2 text-sm text-zinc-500">/ месяц</span>
         </div>
 
@@ -117,13 +122,33 @@ export default async function SubscriptionPage({
             Подписка уже активна. Чтобы отменить — напиши в поддержку.
           </p>
         ) : (
-          <div className="mt-8">
+          <div className="mt-8 space-y-3">
             <CheckoutButton />
-            <p className="mt-3 text-center text-xs text-zinc-500">
+            <div className="flex justify-center">
+              <TPayBadge />
+            </div>
+            <p className="text-center text-xs text-zinc-500">
               Карта привяжется, но первые 24 часа — бесплатно. В любой момент можно отменить.
             </p>
           </div>
         )}
+
+        <p className="mt-6 text-xs text-zinc-500">
+          Страна производителя услуги: {LEGAL.productCountry}. Оформляя подписку,
+          ты соглашаешься с{" "}
+          <Link href="/terms" className="text-zinc-700 underline hover:text-zinc-900">
+            условиями использования
+          </Link>{" "}
+          и{" "}
+          <Link href="/privacy" className="text-zinc-700 underline hover:text-zinc-900">
+            политикой конфиденциальности
+          </Link>
+          . Возврат — см.{" "}
+          <Link href="/refund" className="text-zinc-700 underline hover:text-zinc-900">
+            условия возврата
+          </Link>
+          .
+        </p>
       </div>
     </div>
   )

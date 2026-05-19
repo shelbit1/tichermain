@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useTransition } from "react"
+import { useId, useState, useTransition } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/Button"
@@ -16,16 +16,23 @@ export function AuthForm({ mode }: Props) {
   const router = useRouter()
   const search = useSearchParams()
   const callbackUrl = search.get("callbackUrl") || "/dashboard"
+  const agreementId = useId()
 
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [agreed, setAgreed] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+
+    if (mode === "signup" && !agreed) {
+      setError("Чтобы продолжить, прими условия использования и политику конфиденциальности.")
+      return
+    }
 
     startTransition(async () => {
       if (mode === "signup") {
@@ -91,11 +98,40 @@ export function AuthForm({ mode }: Props) {
           minLength={6}
         />
 
+        {mode === "signup" && (
+          <label htmlFor={agreementId} className="flex cursor-pointer items-start gap-3 pt-1">
+            <input
+              id={agreementId}
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              required
+              className="mt-0.5 h-4 w-4 cursor-pointer rounded border-zinc-300 text-blue-600 focus:ring-blue-500/30"
+            />
+            <span className="text-sm leading-5 text-zinc-600">
+              Я принимаю{" "}
+              <Link href="/privacy" target="_blank" className="font-medium text-zinc-900 hover:underline">
+                Политику конфиденциальности
+              </Link>{" "}
+              и{" "}
+              <Link href="/terms" target="_blank" className="font-medium text-zinc-900 hover:underline">
+                Условия использования
+              </Link>
+              .
+            </span>
+          </label>
+        )}
+
         {error && (
           <p className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>
         )}
 
-        <Button type="submit" disabled={pending} size="lg" className="w-full">
+        <Button
+          type="submit"
+          disabled={pending || (mode === "signup" && !agreed)}
+          size="lg"
+          className="w-full"
+        >
           {pending
             ? mode === "signup"
               ? "Создаём аккаунт…"

@@ -1,8 +1,11 @@
 import { Check } from "lucide-react"
 import { LinkButton } from "@/components/ui/Button"
+import { TPayBadge } from "@/components/legal/TPayBadge"
+import { LEGAL } from "@/lib/legal"
 
 const PERKS = [
-  "Неограниченная генерация эссе",
+  "Доступ ко всем языкам: английский, азербайджанский, испанский, китайский",
+  "Неограниченная генерация и проверка эссе",
   "Все уровни сложности (A1–C2)",
   "Перевод слов через DeepL",
   "История и личный словарь",
@@ -20,11 +23,13 @@ export function Pricing() {
 
         <div className="mt-10 rounded-2xl border-2 border-blue-500/70 bg-white p-6 shadow-sm sm:mt-12 sm:p-10">
           <p className="text-center text-xs font-semibold tracking-[0.2em] text-zinc-600 uppercase">
-            Тичер AI Premium
+            Подписка Тичер AI
           </p>
           <div className="mt-5 flex items-end justify-center gap-2">
             <span className="text-2xl font-medium text-zinc-700">₽</span>
-            <span className="text-5xl font-semibold tracking-tight text-zinc-900 sm:text-6xl">490</span>
+            <span className="text-5xl font-semibold tracking-tight text-zinc-900 sm:text-6xl">
+              {LEGAL.monthlyPriceRub}
+            </span>
           </div>
           <p className="mt-1 text-center text-sm text-zinc-500">в месяц</p>
 
@@ -37,14 +42,20 @@ export function Pricing() {
             ))}
           </ul>
 
-          <div className="mt-9">
+          <div className="mt-9 flex flex-col items-stretch gap-3">
             <LinkButton href="/signup" variant="secondary" className="w-full" size="lg">
               Оформить подписку
             </LinkButton>
+            <div className="flex items-center justify-center">
+              <TPayBadge />
+            </div>
           </div>
 
           <p className="mt-4 text-center text-xs text-zinc-500">
             1 день пробного периода — без списания. 10 действий бесплатно без карты.
+          </p>
+          <p className="mt-3 text-center text-xs text-zinc-500">
+            Страна производителя услуги: {LEGAL.productCountry}. Доступ открывается сразу после оплаты, онлайн, без ограничений по регионам.
           </p>
         </div>
       </div>
