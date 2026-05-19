@@ -58,11 +58,6 @@ export function AuthForm({ mode }: Props) {
     })
   }
 
-  const onGoogle = () => {
-    setError(null)
-    void signIn("google", { callbackUrl: mode === "signup" ? "/onboarding" : callbackUrl })
-  }
-
   return (
     <div className="w-full">
       <form onSubmit={onSubmit} className="space-y-4">
@@ -111,21 +106,6 @@ export function AuthForm({ mode }: Props) {
         </Button>
       </form>
 
-      <div className="my-6 flex items-center gap-3">
-        <span className="h-px flex-1 bg-zinc-200" />
-        <span className="text-xs text-zinc-400">или</span>
-        <span className="h-px flex-1 bg-zinc-200" />
-      </div>
-
-      <button
-        type="button"
-        onClick={onGoogle}
-        className="flex h-12 w-full cursor-pointer items-center justify-center gap-3 rounded-xl border border-zinc-300 bg-white px-5 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-50"
-      >
-        <GoogleIcon />
-        Продолжить с Google
-      </button>
-
       <p className="mt-6 text-center text-sm text-zinc-500">
         {mode === "login" ? (
           <>
@@ -173,28 +153,5 @@ function Field({ label, type, value, onChange, placeholder, required, minLength,
         className="mt-1.5 h-11 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
       />
     </label>
-  )
-}
-
-function GoogleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-      <path
-        d="M21.6 12.227c0-.709-.064-1.39-.182-2.045H12v3.868h5.382a4.6 4.6 0 0 1-1.995 3.018v2.51h3.232c1.89-1.74 2.981-4.305 2.981-7.351Z"
-        fill="#4285F4"
-      />
-      <path
-        d="M12 22c2.7 0 4.964-.895 6.619-2.422l-3.232-2.51c-.895.6-2.04.955-3.387.955-2.605 0-4.81-1.76-5.595-4.123H3.064v2.59A9.996 9.996 0 0 0 12 22Z"
-        fill="#34A853"
-      />
-      <path
-        d="M6.405 13.9a6.003 6.003 0 0 1 0-3.8V7.51H3.064a10.005 10.005 0 0 0 0 8.98l3.341-2.59Z"
-        fill="#FBBC05"
-      />
-      <path
-        d="M12 5.977c1.468 0 2.786.505 3.823 1.495l2.867-2.868C16.96 2.99 14.695 2 12 2 8.087 2 4.71 4.243 3.064 7.51l3.341 2.59C7.19 7.737 9.395 5.977 12 5.977Z"
-        fill="#EA4335"
-      />
-    </svg>
   )
 }

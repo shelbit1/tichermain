@@ -1,6 +1,5 @@
 import NextAuth from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
-import Google from "next-auth/providers/google"
 import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { prisma } from "@/lib/prisma"
@@ -10,11 +9,6 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      allowDangerousEmailAccountLinking: true,
-    }),
     Credentials({
       name: "Email и пароль",
       credentials: {
@@ -52,8 +46,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   secret: process.env.AUTH_SECRET,
-  // Credentials провайдер требует JWT-сессии.
-  // PrismaAdapter продолжает хранить юзеров и OAuth-аккаунты в БД.
+  // Credentials провайдер требует JWT-сессии. PrismaAdapter продолжает
+  // хранить юзеров в БД.
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",

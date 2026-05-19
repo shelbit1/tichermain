@@ -25,7 +25,7 @@ export default async function LoginPage() {
           Войти в Тичер AI
         </h1>
         <p className="mt-2 text-center text-sm text-zinc-500">
-          Используй email и пароль или войди через Google.
+          Войди по email и паролю.
         </p>
 
         <div className="mt-8">
