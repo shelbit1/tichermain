@@ -1,0 +1,14 @@
+meta:
+  environment: node
+  toolchain:
+    name: npm
+    version: 20
+
+build:
+  # Amvera сам запускает `npm install` (триггерит postinstall: prisma generate),
+  # затем выполняем сборку Next.js.
+  additionalCommands: npm run build
+
+run:
+  command: npm run start
+  containerPort: 3000
